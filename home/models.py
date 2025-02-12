@@ -1,0 +1,27 @@
+from django.db import models
+
+class Property(models.Model):
+    uu_id = models.CharField(max_length=255)
+    type = models.CharField(max_length=255, null=True, blank=True)
+    area = models.FloatField(default=0.0, null=True, blank=True)
+    bathrooms = models.IntegerField(default=0, null=True, blank=True)
+    bedrooms = models.IntegerField(default=0, null=True, blank=True)
+    suites = models.IntegerField(default=0, null=True, blank=True)
+    parkingSpaces = models.IntegerField(default=0, null=True, blank=True)
+    amenities = models.JSONField(default=list, null=True, blank=True)
+    installations = models.JSONField(default=list, null=True, blank=True)
+    salePrice = models.FloatField(default=0.0, null=True, blank=True)
+    iptuPlusCondominium = models.FloatField(default=0.0, null=True, blank=True)
+    url_coverImage = models.CharField(max_length=255, null=True, blank=True)
+    url_orderedImageList = models.JSONField(default=list, null=True, blank=True)
+    direct_url = models.CharField(max_length=255, null=True, blank=True)
+    forRent = models.BooleanField(default=False, null=True, blank=True)
+    forSale = models.BooleanField(default=False, null=True, blank=True)
+    rent_price = models.FloatField(default=0.0, null=True, blank=True)
+    total_cost_rent = models.FloatField(default=0.0, null=True, blank=True)
+    source = models.CharField(max_length=255, null=True, blank=True)
+
+    address = models.CharField(max_length=255, null=True, blank=True)
+    city = models.CharField(max_length=255, null=True, blank=True)
+    neighbourhood = models.CharField(max_length=255, null=True, blank=True)
+    regionName = models.CharField(max_length=255, null=True, blank=True)
