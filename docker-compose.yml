@@ -5,9 +5,7 @@ services:
     depends_on:
       - db
       - redis
-    environment:
-      - DATABASE_URL=postgres://postgres:password@db:5432/botdb
-      - REDIS_URL=redis://redis:6379
+    env_file: .env
     volumes:
       - .:/app
     ports:

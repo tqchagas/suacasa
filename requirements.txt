@@ -6,6 +6,8 @@ beautifulsoup4==4.13.3
 certifi==2025.1.31
 cffi==1.17.1
 charset-normalizer==3.4.1
+click==8.1.8
+cloudscraper==1.2.71
 constantly==23.10.4
 cryptography==44.0.0
 cssselect==1.2.0
@@ -14,8 +16,10 @@ defusedxml==0.7.1
 dj-database-url==2.3.0
 Django==5.1.6
 django-extensions==3.2.3
+django-rq==3.0.0
 executing==2.2.0
 filelock==3.17.0
+gunicorn==23.0.0
 hyperlink==21.0.0
 idna==3.10
 incremental==24.7.2
@@ -42,9 +46,13 @@ pycparser==2.22
 PyDispatcher==2.0.7
 Pygments==2.19.1
 pyOpenSSL==25.0.0
+pyparsing==3.2.1
 queuelib==1.7.0
+redis==5.2.1
 requests==2.32.3
 requests-file==2.1.0
+requests-toolbelt==1.0.0
+rq==2.1.0
 Scrapy==2.12.0
 service-identity==24.2.0
 setuptools==75.8.0
