@@ -21,6 +21,25 @@ def generate_random_string(length=32):
     characters = string.ascii_letters + string.digits  # Letras maiúsculas, minúsculas e números
     return ''.join(random.choices(characters, k=length))
 
+
+def get_neighborhoods(citie_id):
+    url = "https://www.quintoandar.com.br/city/{citie_id}?neighborhoodBusinessContext=RENT".format(
+        citie_id=citie_id)
+    headers = {"User-Agent": "Mozilla/5.0"}
+
+    response = requests.get(url, headers=headers)
+    json_data = response.json()
+    neighbourhoods = json_data["neighborhoods"]
+    data = []
+    for neighbourhood in neighbourhoods:
+        data.append({
+            "id": neighbourhood["id"],
+            "name": neighbourhood["name"],
+            "slug": neighbourhood["slug"],
+        })
+    return data
+
+
 def get_cities(): 
     url = "https://www.quintoandar.com.br/"
     headers = {"User-Agent": "Mozilla/5.0"}
@@ -33,13 +52,18 @@ def get_cities():
     json_data = json.loads(json_text)
     cities = json_data["props"]["pageProps"]["cities"]
     data = []
+    import ipdb; ipdb.set_trace();
     for citie in cities:
+        region_id = citie['regionId']
+        neighborhoods = get_neighborhoods(region_id)
+        print(citie["name"], len(neighborhoods))
         data.append({
             "id": citie["placeId"],
             "name": citie["name"],
             "slug": citie["slug"],
             "stateName": citie["stateName"],
             "stateShortName": citie["stateShortName"],
+            "neighborhoods": neighborhoods,
         })
 
     return data
@@ -183,86 +207,72 @@ def do_request(slug, type):
 def get_all():
     cities = get_cities()
     for citie in cities:
-        slug = citie["slug"]
-        print(slug)
-        hits = do_request(slug, "RENT")
-        if hits: 
-
-            data = []
-
-            #csv_filename = "{slug}-dados.csv".format(slug=slug)
-
-            # Criar e salvar os dados no CSV
-            # with open(csv_filename, mode="w", newline="", encoding="utf-8") as file:
-            #     writer = csv.writer(file)
-                
-            #     # Cabeçalhos do CSV
-            #     writer.writerow(["id", "type", "area", "bathrooms", "bedrooms", 
-            #                     "suites", "parkingSpaces", "amenities",
-            #                     "salePrice", "iptuPlusCondominium",
-            #                     "coverImage", "orderedImageList",
-            #                     "url", "forRent", "forSale", "rentPrice", "totalCosRent"])
-                
-            # Escrever os dados
-            for hit in hits:
-                id = hit['_id']
-                source = hit['_source']
-                type = source.get("type")
-                area = source.get("area")
-                bathrooms = source.get("bathrooms")
-                bedrooms = source.get("bedrooms")
-                suites = source.get("suites")
-                parkingSpaces = source.get("parkingSpaces")
-                amenities = source.get("amenities")
-                if amenities: 
-                    amenities = ", ".join(amenities)
-                installations = source.get("installations")
-                if installations:
-                    installations = ", ".join(installations)
-                coverImage = source.get("coverImage")
-                salePrice = source.get("salePrice")
-                iptuPlusCondominium = source.get("iptuPlusCondominium")
-                direct_url = "{prefix}/{id}/comprar/".format(
-                    prefix="https://www.quintoandar.com.br/imovel/",
-                    id=id
-                )
-                orderedImageList = hit["orderedImageList"]
-                forRent = source.get("forRent")
-                forSale = source.get("forSale")
-                rent_price = source.get("rent")
-                total_cost_rent = source.get("totalCost")
-                address = source.get("address")
-                city = source.get("city")
-                neighbourhood = source.get("neighbourhood")
-                regionName = source.get("regionName")
-
-                try:
-                    Property.objects.get(uu_id=id)
-                except Property.DoesNotExist:
-                    Property.objects.create(
-                        uu_id=id,
-                        type=type,
-                        area=area,
-                        bathrooms=bathrooms,
-                        bedrooms=bedrooms,
-                        suites=suites,
-                        parkingSpaces=parkingSpaces,
-                        amenities=amenities,
-                        installations=installations,
-                        salePrice=salePrice,
-                        iptuPlusCondominium=iptuPlusCondominium,
-                        url_coverImage=coverImage,
-                        url_orderedImageList=orderedImageList,
-                        direct_url=direct_url,
-                        forRent=forRent,
-                        forSale=forSale,
-                        rent_price=rent_price,
-                        total_cost_rent=total_cost_rent,
-                        source="quintoandar",
-                        address=address,
-                        city=city,
-                        neighbourhood=neighbourhood,
-                        regionName=regionName,
+        neighbourhoods = citie["neighborhoods"]
+        for neighbourhood in neighbourhoods:
+            slug = neighbourhood["slug"]
+            print(slug)
+            hits = do_request(slug, "RENT")
+            if hits: 
+                data = []
+                for hit in hits:
+                    id = hit['_id']
+                    source = hit['_source']
+                    type = source.get("type")
+                    area = source.get("area")
+                    bathrooms = source.get("bathrooms")
+                    bedrooms = source.get("bedrooms")
+                    suites = source.get("suites")
+                    parkingSpaces = source.get("parkingSpaces")
+                    amenities = source.get("amenities")
+                    if amenities: 
+                        amenities = ", ".join(amenities)
+                    installations = source.get("installations")
+                    if installations:
+                        installations = ", ".join(installations)
+                    coverImage = source.get("coverImage")
+                    salePrice = source.get("salePrice")
+                    iptuPlusCondominium = source.get("iptuPlusCondominium")
+                    direct_url = "{prefix}/{id}/comprar/".format(
+                        prefix="https://www.quintoandar.com.br/imovel/",
+                        id=id
                     )
+                    orderedImageList = hit["orderedImageList"]
+                    forRent = source.get("forRent")
+                    forSale = source.get("forSale")
+                    rent_price = source.get("rent")
+                    total_cost_rent = source.get("totalCost")
+                    address = source.get("address")
+                    city = source.get("city")
+                    neighbourhood = source.get("neighbourhood")
+                    regionName = source.get("regionName")
+
+                    try:
+                        Property.objects.get(uu_id=id)
+                    except Property.DoesNotExist:
+                        Property.objects.create(
+                            uu_id=id,
+                            type=type,
+                            area=area,
+                            bathrooms=bathrooms,
+                            bedrooms=bedrooms,
+                            suites=suites,
+                            parkingSpaces=parkingSpaces,
+                            amenities=amenities,
+                            installations=installations,
+                            salePrice=salePrice,
+                            iptuPlusCondominium=iptuPlusCondominium,
+                            url_coverImage=coverImage,
+                            url_orderedImageList=orderedImageList,
+                            direct_url=direct_url,
+                            forRent=forRent,
+                            forSale=forSale,
+                            rent_price=rent_price,
+                            total_cost_rent=total_cost_rent,
+                            source="quintoandar",
+                            address=address,
+                            city=city,
+                            neighbourhood=neighbourhood,
+                            regionName=regionName,
+                        )
 
 get_all()
